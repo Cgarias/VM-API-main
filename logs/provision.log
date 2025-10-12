@@ -1,0 +1,2 @@
+[2025-09-29T19:27:55.834Z] Provider: Azure, Params: {"size":"Standard_B1s","resourceGroup":"rg-test","image":"UbuntuLTS","vnet":"vnet-test"}, Result: {"success":true,"id":"Azure-1759174075832"}
+[2025-09-29T19:28:17.793Z] Provider: aws, Params: {"instanceType":"t2.micro","region":"us-east-1","vpc":"vpc-123","ami":"ami-456"}, Result: {"success":true,"id":"aws-1759174097792"}
