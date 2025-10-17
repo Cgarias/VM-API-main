@@ -1,12 +1,16 @@
-const { register } = require("./index");
+// src/factories/AzureFactory.js
+
 const VMFactory = require("./VMFactory");
-const VMAzure = require("../models/VMAzure");
+const FactoryRegistry = require("./FactoryRegistry");
+const AzureBuilder = require("../builders/AzureBuilder");
 
 class AzureFactory extends VMFactory {
-  createVM(params) {
-    return new VMAzure(params);
-  }
+    createBuilder() {
+        return new AzureBuilder();
+    }
 }
 
-register("azure", AzureFactory);
+// Se registra a sí misma en el registro central
+FactoryRegistry.register("azure", AzureFactory);
+
 module.exports = AzureFactory;

@@ -1,39 +1,28 @@
 const VMDirector = require("../directors/VMDirector");
-
-// Un simple "Factory" para obtener el builder correcto
-const getBuilder = (provider) => {
-    switch (provider.toLowerCase()) {
-        case "aws":
-            const AWSBuilder = require("../builders/AWSBuilder");
-            return new AWSBuilder();
-        case "azure":
-            const AzureBuilder = require("../builders/AzureBuilder");
-            return new AzureBuilder();
-        case "gcp":
-            const GCPBuilder = require("../builders/GCPBuilder");
-            return new GCPBuilder();
-        case "onpremise":
-        case "on-premise":
-            const OnPremiseBuilder = require("../builders/OnPremiseBuilder");
-            return new OnPremiseBuilder();
-        default:
-            return null;
-    }
-};
+// 🔽 1. Importa el registro de fábricas
+const FactoryRegistry = require("../factories/FactoryRegistry"); 
+// 🔽 2. Carga todas las fábricas para que se registren solas
+require("../factories/loader"); 
 
 exports.provisionVM = (req, res) => {
     const { provider, vmType, params } = req.body;
 
-    const builder = getBuilder(provider);
-    if (!builder) {
+    // 🔽 3. Obtén la clase de la fábrica desde el registro
+    const Factory = FactoryRegistry.getFactory(provider);
+    if (!Factory) {
         return res.status(400).json({ success: false, error: "Proveedor no soportado" });
     }
 
     try {
-        // ✅ El director devuelve el producto final (si actualizaste tu VMDirector.js)
-        const vmProduct = VMDirector.construct(builder, provider, vmType, params);
+        // 🔽 4. Crea una instancia de la fábrica y luego crea el builder
+        const factoryInstance = new Factory();
+        const builder = factoryInstance.createBuilder(); // Nuevo método que añadiremos
 
-        // Obtiene los detalles del producto (usa tu clase VirtualMachineProduct)
+        if (!builder) {
+            throw new Error(`El builder para '${provider}' no pudo ser creado.`);
+        }
+        
+        const vmProduct = VMDirector.construct(builder, provider, vmType, params);
         const vmDetails = vmProduct.getDetails();
         const id = `${provider}-${Date.now()}`;
 

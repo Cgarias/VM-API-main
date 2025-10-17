@@ -1,12 +1,16 @@
+// src/factories/AWSFactory.js
+
 const VMFactory = require("./VMFactory");
-const { register } = require("./index");
-const VMAws = require("../models/VMAws");
+const FactoryRegistry = require("./FactoryRegistry");
+const AWSBuilder = require("../builders/AWSBuilder");
 
 class AWSFactory extends VMFactory {
-    createVM(params) {
-        return new VMAws(params);
+    createBuilder() {
+        return new AWSBuilder();
     }
 }
 
-register("aws", AWSFactory);
+// Se registra a sí misma en el registro central
+FactoryRegistry.register("aws", AWSFactory);
+
 module.exports = AWSFactory;

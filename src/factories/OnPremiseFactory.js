@@ -1,12 +1,17 @@
+// src/factories/OnPremiseFactory.js
+
 const VMFactory = require("./VMFactory");
-const { register } = require("./index");
-const VMOnpremise = require("../models/VMOnPremise");
+const FactoryRegistry = require("./FactoryRegistry");
+const OnPremiseBuilder = require("../builders/OnPremiseBuilder");
 
 class OnPremiseFactory extends VMFactory {
-    createVM(params) {
-        return new VMOnpremise(params);
+    createBuilder() {
+        return new OnPremiseBuilder();
     }
 }
 
-register("OnPremise", OnPremiseFactory);
+// Se registra a sí misma en el registro central
+FactoryRegistry.register("onpremise", OnPremiseFactory);
+FactoryRegistry.register("on-premise", OnPremiseFactory); // Alias
+
 module.exports = OnPremiseFactory;

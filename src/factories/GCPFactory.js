@@ -1,12 +1,16 @@
+// src/factories/GCPFactory.js
+
 const VMFactory = require("./VMFactory");
-const { register } = require("./index");
-const VMGCP = require("../models/VMGCP");
+const FactoryRegistry = require("./FactoryRegistry");
+const GCPBuilder = require("../builders/GCPBuilder");
 
 class GCPFactory extends VMFactory {
-    createVM(params) {
-        return new VMGCP(params);
+    createBuilder() {
+        return new GCPBuilder();
     }
 }
 
-register("GCP", GCPFactory);
+// Se registra a sí misma en el registro central
+FactoryRegistry.register("gcp", GCPFactory);
+
 module.exports = GCPFactory;
