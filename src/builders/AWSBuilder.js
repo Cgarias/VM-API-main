@@ -1,14 +1,13 @@
-// src/builders/AzureBuilder.js
+// src/builders/AWSBuilder.js
 
 const IBuilder = require("./IBuilder");
+const IPrototype = require("./IPrototype");
 const VirtualMachineProduct = require("../models/VirtualMachineProduct");
 
-// NO importamos los modelos de Azure aquí arriba.
-
-class AzureBuilder extends IBuilder {
+class AWSBuilder extends IBuilder {
     constructor() {
         super();
-        this.product = new VirtualMachineProduct("Azure");
+        this.product = new VirtualMachineProduct("AWS");
         this._config = {};
     }
 
@@ -23,27 +22,21 @@ class AzureBuilder extends IBuilder {
     }
 
     buildVirtualMachine(params) {
-        // Hacemos el require() JUSTO cuando lo necesitamos
-        const AzureVirtualMachine = require("../models/azure/AzureVirtualMachine");
-        
+        const AWSVirtualMachine = require("../models/aws/AWSVirtualMachine");
         const vmParams = { ...params, ...this._config };
-        this.product.vm = new AzureVirtualMachine(vmParams);
+        this.product.vm = new AWSVirtualMachine(vmParams);
         return this;
     }
 
     buildNetwork(params) {
-        // Hacemos el require() JUSTO cuando lo necesitamos
-        const AzureNetwork = require("../models/azure/AzureNetwork");
-        
-        this.product.network = new AzureNetwork(params);
+        const AWSNetwork = require("../models/aws/AWSNetwork");
+        this.product.network = new AWSNetwork(params);
         return this;
     }
 
     buildStorage(params) {
-        // Hacemos el require() JUSTO cuando lo necesitamos
-        const AzureStorage = require("../models/azure/AzureStorage");
-        
-        this.product.storage = new AzureStorage(params);
+        const AWSStorage = require("../models/aws/AWSStorage");
+        this.product.storage = new AWSStorage(params);
         return this;
     }
 
@@ -51,12 +44,27 @@ class AzureBuilder extends IBuilder {
         if (!this.product.network || !this.product.storage) {
             throw new Error("Network and Storage must be built before getting the result.");
         }
-        
         if (this.product.network.region !== this.product.storage.region) {
-            throw new Error("Region mismatch between Network and Storage for Azure.");
+            throw new Error("Region mismatch between Network and Storage for AWS.");
         }
         return this.product;
     }
+
+    // --- Implementación de IPrototype ---
+
+    clone() {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    }
+
+    deepclone() {
+        const serialized = JSON.stringify({ _config: this._config });
+        const newBuilder = new AWSBuilder(); // <-- Instancia correcta
+        Object.assign(newBuilder, JSON.parse(serialized));
+        
+        newBuilder.product = new VirtualMachineProduct("AWS"); // <-- Producto correcto
+        
+        return newBuilder;
+    }
 }
 
-module.exports = AzureBuilder;
+module.exports = AWSBuilder;

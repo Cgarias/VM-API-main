@@ -1,9 +1,9 @@
-// src/builders/AzureBuilder.js
-
 const IBuilder = require("./IBuilder");
+const IPrototype = require("./IPrototype"); // <-- 1. Importar
 const VirtualMachineProduct = require("../models/VirtualMachineProduct");
 
-class AzureBuilder extends IBuilder {
+// En JS, la implementación de interfaces es implícita al añadir los métodos
+class AzureBuilder extends IBuilder { 
     constructor() {
         super();
         this.product = new VirtualMachineProduct("Azure");
@@ -43,11 +43,31 @@ class AzureBuilder extends IBuilder {
         if (!this.product.network || !this.product.storage) {
             throw new Error("Network and Storage must be built before getting the result.");
         }
-        
         if (this.product.network.region !== this.product.storage.region) {
             throw new Error("Region mismatch between Network and Storage for Azure.");
         }
         return this.product;
+    }
+
+    // --- 2. Implementación de IPrototype ---
+
+    clone() {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+    }
+
+    /**
+     * Crea una copia profunda y segura del builder, reiniciando el producto.
+     */
+    deepclone() {
+        // La serialización/deserialización es una forma simple de hacer una copia profunda
+        // para objetos compatibles con JSON.
+        const serialized = JSON.stringify({ _config: this._config });
+        const newBuilder = new AzureBuilder();
+        Object.assign(newBuilder, JSON.parse(serialized));
+        
+        newBuilder.product = new VirtualMachineProduct("Azure");
+        
+        return newBuilder;
     }
 }
 
